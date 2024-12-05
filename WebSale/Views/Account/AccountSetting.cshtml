@@ -1,0 +1,47 @@
+﻿@model WebSale.Models.User
+
+<h1 class="text-center mt-4">Account Settings</h1>
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title">Welcome, @Model.Username!</h5>
+                <p>Email: @Model.Email</p>
+                <p>Phone Number: @Model.PhoneNumber</p>
+
+                <hr />
+
+                <h5>Available Functions</h5>
+                <ul class="list-group">
+                    @if (Model.IsAdmin)
+                    {
+                        <li class="list-group-item">
+                            <a href="/Product/AddProduct" class="btn btn-link">Add Product</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/Product/EditProduct" class="btn btn-link">Edit Products</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/Product/DeleteProduct" class="btn btn-link">Delete Products</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/Account/LockUser" class="btn btn-link">Manage Users (Lock/Unlock)</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="list-group-item">
+                            <a href="/Account/Cart" class="btn btn-link">View Cart</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/Account/PurchaseHistory" class="btn btn-link">Purchase History</a>
+                        </li>
+                    }
+                    <li class="list-group-item">
+                        <a href="/Account/UpdateAccount" class="btn btn-link">Update Account Information</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

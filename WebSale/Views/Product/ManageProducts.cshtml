@@ -1,0 +1,297 @@
+﻿@model IEnumerable<WebSale.Models.Product>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 50px; /* Khoảng trống để không bị đè bởi footer */
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+            .btn-success:hover {
+                background-color: #218838;
+                border-color: #1e7e34;
+            }
+
+        .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+        }
+
+            .btn-warning:hover {
+                background-color: #e0a800;
+                border-color: #d39e00;
+            }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+            .btn-danger:hover {
+                background-color: #c82333;
+                border-color: #bd2130;
+            }
+
+        table {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            text-align: right;
+            padding: 10px 20px;
+            background-color: #ffffff;
+            font-size: 0.85rem;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center">Manage Products</h1>
+        <div class="text-end mb-3">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                Add Product
+            </button>
+        </div>
+
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model)
+                {
+                    <tr>
+                        <td>@product.Id</td>
+                        <td>@product.Name</td>
+                        <td>@product.Category</td>
+                        <td>@product.Price</td>
+                        <td>@product.Description</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editProduct('@product.Id')">Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProduct('@product.Id')">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        © 2024 WebSale
+    </footer>
+
+    <!-- Add/Edit Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProductForm">
+                        <input type="hidden" id="ProductId" />
+                        <div class="mb-3">
+                            <label for="Name" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="Name" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="Category" class="form-label">Category</label>
+                            <input type="text" class="form-control" id="Category" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="Price" class="form-label">Price</label>
+                            <input type="number" class="form-control" id="Price" step="0.01" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="Description" class="form-label">Description</label>
+                            <textarea class="form-control" id="Description" rows="3"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary" id="saveProductBtn">Save Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    // Load products into the table
+    function loadProducts() {
+        fetch('/Product/GetAllProducts')
+            .then(response => response.json())
+            .then(data => {
+                const productTableBody = document.querySelector(".product-table tbody");
+                productTableBody.innerHTML = ""; // Clear existing content
+                data.forEach(product => {
+                    productTableBody.innerHTML += `
+                        <tr>
+                            <td>${product.id || 'N/A'}</td>
+                            <td>${product.name || 'N/A'}</td>
+                            <td>${product.category || 'N/A'}</td>
+                            <td>${product.price || 'N/A'}</td>
+                            <td>${product.description || 'N/A'}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editProduct('${product.id}')">Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product.id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Add or Update a product
+    function saveProductHandler(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const productId = document.getElementById("ProductId").value;
+        const formData = {
+            Id: productId || null,
+            Name: document.getElementById("Name").value,
+            Category: document.getElementById("Category").value,
+            Price: parseFloat(document.getElementById("Price").value),
+            Description: document.getElementById("Description").value
+        };
+
+        const url = productId ? '/Product/UpdateProduct' : '/Product/AddProduct';
+        const method = productId ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById("addProductModal"));
+            modal.hide();
+
+            loadProducts(); // Reload the product list
+        })
+        .catch(error => {
+            console.error("Error:", error.message);
+            alert("Failed to save product: " + error.message);
+        });
+    }
+
+    // Open Add Product Modal
+    function openModalForAdd() {
+        const saveButton = document.getElementById("saveProductBtn");
+
+        // Remove existing event listener to avoid duplicate calls
+        saveButton.removeEventListener("click", saveProductHandler);
+        saveButton.addEventListener("click", saveProductHandler);
+
+        // Reset form fields
+        document.getElementById("ProductId").value = "";
+        document.getElementById("Name").value = "";
+        document.getElementById("Category").value = "";
+        document.getElementById("Price").value = "";
+        document.getElementById("Description").value = "";
+
+        // Update modal title and button text
+        document.getElementById("addProductModalLabel").innerText = "Add New Product";
+        saveButton.innerText = "Save Product";
+
+        const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
+        modal.show();
+    }
+
+    // Edit Product
+    function editProduct(productId) {
+        fetch(`/Product/GetProductById?id=${productId}`)
+            .then(response => response.json())
+            .then(product => {
+                // Populate modal fields with product data
+                document.getElementById("ProductId").value = product.id;
+                document.getElementById("Name").value = product.name;
+                document.getElementById("Category").value = product.category;
+                document.getElementById("Price").value = product.price;
+                document.getElementById("Description").value = product.description;
+
+                // Update modal title and button text
+                document.getElementById("addProductModalLabel").innerText = "Edit Product";
+                const saveButton = document.getElementById("saveProductBtn");
+                saveButton.innerText = "Update Product";
+
+                // Remove existing event listener to avoid duplicate calls
+                saveButton.removeEventListener("click", saveProductHandler);
+                saveButton.addEventListener("click", saveProductHandler);
+
+                const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
+                modal.show();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Delete Product
+    function deleteProduct(productId) {
+        if (!confirm("Are you sure you want to delete this product?")) return;
+
+        fetch(`/Product/DeleteProduct?id=${productId}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            loadProducts(); // Reload the product list
+        })
+        .catch(error => console.error("Error:", error));
+    }
+
+    // Load products on page load
+    document.addEventListener("DOMContentLoaded", function () {
+        loadProducts();
+    });
+</script>
+</body>
+</html>

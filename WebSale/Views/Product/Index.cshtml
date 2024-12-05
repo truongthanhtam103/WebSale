@@ -1,0 +1,45 @@
+﻿@model WebSale.Models.ProductIndexViewModel
+
+<h1 class="mt-4 text-center">Product List</h1>
+
+<!-- Hiển thị danh sách các loại hàng hóa -->
+<div class="mb-4 text-center">
+    <h4>Categories</h4>
+    <ul class="list-inline">
+        @foreach (var category in Model.Categories)
+        {
+            <li class="list-inline-item">
+                <a href="@Url.Action("Index", "Product", new { category = category })" class="btn btn-outline-primary">
+                    @category
+                </a>
+            </li>
+        }
+    </ul>
+</div>
+
+<!-- Hiển thị danh sách sản phẩm -->
+<div class="row">
+    @if (Model.Products == null || !Model.Products.Any())
+    {
+        <div class="col-12 text-center">
+            <p>No products found in this category.</p>
+        </div>
+    }
+    else
+    {
+        foreach (var product in Model.Products)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">@product.Description</p>
+                        <p class="card-text"><strong>Price:</strong> $@product.Price</p>
+                        <p class="card-text"><small class="text-muted">Category: @product.Category</small></p>
+                        <a href="#" class="btn btn-primary">Buy Now</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
