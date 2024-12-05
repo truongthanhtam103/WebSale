@@ -102,19 +102,6 @@ namespace WebSale.Controllers
             return View(users);
         }
 
-        [HttpPut]
-        public IActionResult ToggleLock(string id)
-        {
-            var user = _users.Find(u => u.Id == id).FirstOrDefault();
-            if (user == null) return NotFound(new { message = "User not found." });
-
-            user.IsLocked = !user.IsLocked;
-            _users.ReplaceOne(u => u.Id == id, user);
-
-            var action = user.IsLocked ? "locked" : "unlocked";
-            return Ok(new { message = $"User has been {action} successfully." });
-        }
-
         [HttpGet]
         public IActionResult UpdateAccountInfo()
         {

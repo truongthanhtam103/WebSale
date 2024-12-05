@@ -34,7 +34,18 @@
                         <td>@user.IsAdmin</td>
                         <td>@user.IsLocked</td>
                         <td>
-                            <button class="btn btn-warning btn-sm" onclick="toggleLockUser('@user.Id', @user.IsLocked)">Toggle Lock</button>
+                            @if (user.IsLocked)
+                            {
+                                <button class="btn btn-success btn-sm" onclick="unlockUser('@user.Id')">
+                                    Unlock
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-warning btn-sm" onclick="lockUser('@user.Id')">
+                                    Lock
+                                </button>
+                            }
                         </td>
                     </tr>
                 }
@@ -47,15 +58,16 @@
     </footer>
 
     <script>
-        function toggleLockUser(userId, isLocked) {
-            if (!confirm(`Are you sure you want to ${isLocked ? 'unlock' : 'lock'} this user?`)) return;
+        // Lock user
+        function lockUser(userId) {
+            if (!confirm("Are you sure you want to lock this user?")) return;
 
             fetch('/Account/LockUser', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(userId) // Gửi ID người dùng trong body
+                body: JSON.stringify(userId)
             })
             .then(response => {
                 if (!response.ok) {
@@ -67,7 +79,36 @@
             })
             .then(data => {
                 alert(data.message);
-                location.reload(); // Reload lại danh sách người dùng
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error.message);
+                alert("Error: " + error.message);
+            });
+        }
+
+        // Unlock user
+        function unlockUser(userId) {
+            if (!confirm("Are you sure you want to unlock this user?")) return;
+
+            fetch('/Account/UnlockUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userId)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.message);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                location.reload();
             })
             .catch(error => {
                 console.error('Error:', error.message);
@@ -75,6 +116,5 @@
             });
         }
     </script>
-
 </body>
 </html>

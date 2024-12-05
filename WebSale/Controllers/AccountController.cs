@@ -13,7 +13,7 @@ namespace WebSale.Controllers
         {
             var client = new MongoClient(configuration["WebSale:ConnectionString"]);
             var database = client.GetDatabase(configuration["WebSale:DatabaseName"]);
-            _users = database.GetCollection<User>("Users");
+            _users = database.GetCollection<User>("User");
             _products = database.GetCollection<Product>("Products");
         }
 
@@ -56,30 +56,68 @@ namespace WebSale.Controllers
             return RedirectToAction("AccountSetting");
         }
 
-        [HttpGet]
-        public IActionResult LockUser()
+        [HttpPost]
+        [Route("Account/LockUser")]
+        public IActionResult LockUser([FromBody] string id)
         {
-            // Kiểm tra quyền admin trước khi cho phép truy cập
-            var isAdmin = HttpContext.Session.GetString("IsAdmin") == "True";
-            if (!isAdmin)
+            if (string.IsNullOrEmpty(id))
             {
-                return RedirectToAction("Index", "Home"); // Redirect về trang chính nếu không phải admin
+                return BadRequest(new { message = "User ID is required." });
             }
 
-            // Lấy danh sách tất cả người dùng
-            var users = _users.Find(_ => true).ToList();
+            // Tìm user và khóa
+            var user = _users.Find(u => u.Id == id).FirstOrDefault();
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
 
-            return View(users); // Trả về view LockUser.cshtml
+            var filter = Builders<User>.Filter.Eq(u => u.Id, id);
+            var update = Builders<User>.Update.Set(u => u.IsLocked, true);
+            var result = _users.UpdateOne(filter, update);
+
+            if (result.ModifiedCount > 0)
+            {
+                return Ok(new { message = "User locked successfully." });
+            }
+
+            return BadRequest(new { message = "Failed to lock user." });
         }
 
         [HttpPost]
-        public IActionResult UnlockUser(string userId)
+        [Route("Account/UnlockUser")]
+        public IActionResult UnlockUser([FromBody] string id)
         {
-            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
-            var update = Builders<User>.Update.Set(u => u.IsLocked, false);
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest(new { message = "User ID is required." });
+            }
 
-            _users.UpdateOne(filter, update);
-            return RedirectToAction("AccountSetting");
+            // Tìm user và mở khóa
+            var user = _users.Find(u => u.Id == id).FirstOrDefault();
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            var filter = Builders<User>.Filter.Eq(u => u.Id, id);
+            var update = Builders<User>.Update.Set(u => u.IsLocked, false);
+            var result = _users.UpdateOne(filter, update);
+
+            if (result.ModifiedCount > 0)
+            {
+                return Ok(new { message = "User unlocked successfully." });
+            }
+
+            return BadRequest(new { message = "Failed to unlock user." });
+        }
+
+        [HttpGet]
+        [Route("Account/ManageUsers")]
+        public IActionResult ManageUsers()
+        {
+            var users = _users.Find(_ => true).ToList();
+            return View("LockUser", users);
         }
 
         [HttpGet]
