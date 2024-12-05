@@ -67,10 +67,19 @@ namespace WebSale.Controllers
         {
             // Kiểm tra tài khoản tồn tại trong cơ sở dữ liệu
             var user = _users.Find(u => u.Username == username && u.Password == password).FirstOrDefault();
+
+            // Kiểm tra tài khoản có tồn tại không
             if (user == null)
             {
                 // Thêm lỗi vào ModelState để hiển thị trên giao diện
                 ModelState.AddModelError(string.Empty, "Invalid username or password.");
+                return View();
+            }
+
+            // Kiểm tra tài khoản đã bị khóa
+            if (user.IsLocked)
+            {
+                ModelState.AddModelError(string.Empty, "Tài khoản đã bị khóa, hãy liên lạc quản trị viên để được mở khóa.");
                 return View();
             }
 
@@ -81,6 +90,7 @@ namespace WebSale.Controllers
             // Chuyển hướng đến trang sản phẩm
             return RedirectToAction("Index", "Product");
         }
+
 
         [HttpPost]
         public IActionResult Logout()
