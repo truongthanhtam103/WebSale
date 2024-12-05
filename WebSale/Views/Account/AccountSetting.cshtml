@@ -25,8 +25,9 @@
                             <a href="/Product/DeleteProduct" class="btn btn-link">Delete Products</a>
                         </li>
                         <li class="list-group-item">
-                            <a href="/Account/LockUser" class="btn btn-link">Manage Users (Lock/Unlock)</a>
+                            <button class="btn btn-link" onclick="lockUserPrompt()">Manage Users (Lock/Unlock)</button>
                         </li>
+
                     }
                     else
                     {
@@ -45,3 +46,37 @@
         </div>
     </div>
 </div>
+<script>
+    function lockUserPrompt() {
+        const userId = prompt("Enter the user ID to lock/unlock:");
+        if (userId) {
+            lockUser(userId);
+        }
+    }
+
+    function lockUser(userId) {
+        fetch('/Account/LockUser', {
+            method: 'POST', // Sử dụng POST
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userId)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            location.reload(); // Reload lại trang nếu cần
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            alert("Error: " + error.message);
+        });
+    }
+</script>

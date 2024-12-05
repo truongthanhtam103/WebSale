@@ -56,25 +56,20 @@ namespace WebSale.Controllers
             return RedirectToAction("AccountSetting");
         }
 
-        [HttpPost]
-        public IActionResult LockUser([FromBody] string id)
+        [HttpGet]
+        public IActionResult LockUser()
         {
-            if (string.IsNullOrEmpty(id))
+            // Kiểm tra quyền admin trước khi cho phép truy cập
+            var isAdmin = HttpContext.Session.GetString("IsAdmin") == "True";
+            if (!isAdmin)
             {
-                return BadRequest(new { message = "User ID is required." });
+                return RedirectToAction("Index", "Home"); // Redirect về trang chính nếu không phải admin
             }
 
-            // Logic khóa tài khoản
-            var filter = Builders<User>.Filter.Eq(u => u.Id, id);
-            var update = Builders<User>.Update.Set(u => u.IsLocked, true);
-            var result = _users.UpdateOne(filter, update);
+            // Lấy danh sách tất cả người dùng
+            var users = _users.Find(_ => true).ToList();
 
-            if (result.ModifiedCount > 0)
-            {
-                return Ok(new { message = "User locked successfully." });
-            }
-
-            return BadRequest(new { message = "Failed to lock user." });
+            return View(users); // Trả về view LockUser.cshtml
         }
 
         [HttpPost]

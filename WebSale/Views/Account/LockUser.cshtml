@@ -51,11 +51,11 @@
             if (!confirm(`Are you sure you want to ${isLocked ? 'unlock' : 'lock'} this user?`)) return;
 
             fetch('/Account/LockUser', {
-                method: 'POST', // Đảm bảo sử dụng POST
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(userId) // Gửi đúng định dạng payload
+                body: JSON.stringify(userId) // Gửi ID người dùng trong body
             })
             .then(response => {
                 if (!response.ok) {
@@ -67,14 +67,14 @@
             })
             .then(data => {
                 alert(data.message);
-                location.reload(); // Reload lại danh sách người dùng nếu cần
+                location.reload(); // Reload lại danh sách người dùng
             })
             .catch(error => {
                 console.error('Error:', error.message);
                 alert("Error: " + error.message);
             });
         }
-
     </script>
+
 </body>
 </html>
