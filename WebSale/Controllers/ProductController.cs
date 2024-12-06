@@ -81,10 +81,11 @@ namespace WebSale.Controllers
                 var errors = ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage);
+                Console.WriteLine("Invalid data:", string.Join(", ", errors)); // Log lỗi
                 return BadRequest(new { message = "Dữ liệu sản phẩm không hợp lệ.", errors });
             }
 
-            // Thêm sản phẩm vào cơ sở dữ liệu
+            Console.WriteLine("Product to add:", product); // Log dữ liệu sản phẩm
             _products.InsertOne(product);
 
             return Ok(new { message = "Thêm sản phẩm thành công." });
@@ -119,19 +120,21 @@ namespace WebSale.Controllers
         [HttpPut]
         public IActionResult UpdateProduct([FromBody] Product product)
         {
-            if (!ModelState.IsValid)
+            if (product == null || string.IsNullOrEmpty(product.Id))
             {
-                var errors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage);
-                return BadRequest(new { message = "Dữ liệu sản phẩm không hợp lệ.", errors });
+                return BadRequest(new { message = "Dữ liệu sản phẩm không hợp lệ." });
             }
 
             var filter = Builders<Product>.Filter.Eq(p => p.Id, product.Id);
-            _products.ReplaceOne(filter, product);
-            return Ok(new { message = "Chỉnh sửa sản phẩm thành công." });
-        }
+            var result = _products.ReplaceOne(filter, product);
 
+            if (result.ModifiedCount > 0)
+            {
+                return Ok(new { message = "Chỉnh sửa sản phẩm thành công." });
+            }
+
+            return NotFound(new { message = "Không tìm thấy sản phẩm để chỉnh sửa." });
+        }
 
     }
 }

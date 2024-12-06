@@ -109,6 +109,7 @@
     <footer>
         © 2024 WebSale
     </footer>
+    <button type="button" class="btn btn-success" onclick="openModalForAdd()">Thêm mới sản phẩm</button>
 
     <!-- Add/Edit Product Modal -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
@@ -143,155 +144,150 @@
             </div>
         </div>
     </div>
+
 <script>
-    // Load products into the table
-    function loadProducts() {
-        fetch('/Product/GetAllProducts')
-            .then(response => response.json())
-            .then(data => {
-                const productTableBody = document.querySelector(".product-table tbody");
-                productTableBody.innerHTML = ""; // Clear existing content
-                data.forEach(product => {
-                    productTableBody.innerHTML += `
-                        <tr>
-                            <td>${product.id || 'N/A'}</td>
-                            <td>${product.name || 'N/A'}</td>
-                            <td>${product.category || 'N/A'}</td>
-                            <td>${product.price || 'N/A'}</td>
-                            <td>${product.description || 'N/A'}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="editProduct('${product.id}')">Chỉnh sửa</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product.id}')">Xóa</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            })
-            .catch(error => console.error('Error:', error));
-    }
+        document.addEventListener("DOMContentLoaded", function () {
+            // Load products on page load
+            loadProducts();
 
-    // Add or Update a product
-    function saveProductHandler(event) {
-        event.preventDefault(); // Prevent default form submission
-
-        const productId = document.getElementById("ProductId").value;
-        const formData = {
-            Id: productId || null,
-            Name: document.getElementById("Name").value,
-            Category: document.getElementById("Category").value,
-            Price: parseFloat(document.getElementById("Price").value),
-            Description: document.getElementById("Description").value
-        };
-
-        const url = productId ? '/Product/UpdateProduct' : '/Product/AddProduct';
-        const method = productId ? 'PUT' : 'POST';
-
-        fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    throw new Error(data.message);
-                });
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(data.message);
-
-            // Close the modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById("addProductModal"));
-            modal.hide();
-
-            loadProducts(); // Reload the product list
-        })
-        .catch(error => {
-            console.error("Error:", error.message);
-            alert("Failed to save product: " + error.message);
+            // Add event listener to the save button
+            const saveButton = document.getElementById("saveProductBtn");
+            saveButton.addEventListener("click", saveProductHandler);
         });
-    }
 
-    // Open Add Product Modal
-    function openModalForAdd() {
-        const saveButton = document.getElementById("saveProductBtn");
+        // Function to load products
+        function loadProducts() {
+            fetch('/Product/GetAllProducts')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector("table tbody");
+                    tableBody.innerHTML = ""; // Clear existing content
 
-        // Remove existing event listener to avoid duplicate calls
-        saveButton.removeEventListener("click", saveProductHandler);
-        saveButton.addEventListener("click", saveProductHandler);
-
-        // Reset form fields
-        document.getElementById("ProductId").value = "";
-        document.getElementById("Name").value = "";
-        document.getElementById("Category").value = "";
-        document.getElementById("Price").value = "";
-        document.getElementById("Description").value = "";
-
-        // Update modal title and button text
-        document.getElementById("addProductModalLabel").innerText = "Thêm mới sản phẩm";
-        saveButton.innerText = "Lưu sản phẩm";
-
-        const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
-        modal.show();
-    }
-
-    // Edit Product
-    function editProduct(productId) {
-        fetch(`/Product/GetProductById?id=${productId}`)
-            .then(response => response.json())
-            .then(product => {
-                // Populate modal fields with product data
-                document.getElementById("ProductId").value = product.id;
-                document.getElementById("Name").value = product.name;
-                document.getElementById("Category").value = product.category;
-                document.getElementById("Price").value = product.price;
-                document.getElementById("Description").value = product.description;
-
-                // Update modal title and button text
-                document.getElementById("addProductModalLabel").innerText = "Chỉnh sửa sản phẩm";
-                const saveButton = document.getElementById("saveProductBtn");
-                saveButton.innerText = "Cập nhật sản phẩm";
-
-                // Remove existing event listener to avoid duplicate calls
-                saveButton.removeEventListener("click", saveProductHandler);
-                saveButton.addEventListener("click", saveProductHandler);
-
-                const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
-                modal.show();
-            })
-            .catch(error => console.error('Error:', error));
-    }
-
-    // Delete Product
-    function deleteProduct(productId) {
-        if (!confirm("Bạn chắc chắn muốn xóa sản phẩm?")) return;
-
-        fetch(`/Product/DeleteProduct?id=${productId}`, {
-            method: 'DELETE'
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(data => {
-                    throw new Error(data.message);
+                    data.forEach(product => {
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${product.id || 'N/A'}</td>
+                                <td>${product.name || 'N/A'}</td>
+                                <td>${product.category || 'N/A'}</td>
+                                <td>${product.price || 'N/A'}</td>
+                                <td>${product.description || 'N/A'}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editProduct('${product.id}')">Chỉnh sửa</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product.id}')">Xóa</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Không thể tải danh sách sản phẩm.");
                 });
-            }
-            return response.json();
-        })
-        .then(data => {
-            alert(data.message);
-            loadProducts(); // Reload the product list
-        })
-        .catch(error => console.error("Error:", error));
-    }
+        }
 
-    // Load products on page load
-    document.addEventListener("DOMContentLoaded", function () {
-        loadProducts();
-    });
+        // Function to handle saving a product
+        function saveProductHandler() {
+            const productId = document.getElementById("ProductId").value;
+            const formData = {
+                Id: productId || null,
+                Name: document.getElementById("Name").value.trim(),
+                Category: document.getElementById("Category").value.trim(),
+                Price: parseFloat(document.getElementById("Price").value),
+                Description: document.getElementById("Description").value.trim()
+            };
+
+            const url = productId ? '/Product/UpdateProduct' : '/Product/AddProduct';
+            const method = productId ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("addProductModal"));
+                    modal.hide();
+
+                    loadProducts(); // Reload the product list
+                })
+                .catch(error => {
+                    console.error("Error:", error.message);
+                    alert("Lỗi khi lưu sản phẩm: " + error.message);
+                });
+        }
+
+        // Function to open the modal for adding a product
+        function openModalForAdd() {
+            document.getElementById("ProductId").value = "";
+            document.getElementById("Name").value = "";
+            document.getElementById("Category").value = "";
+            document.getElementById("Price").value = "";
+            document.getElementById("Description").value = "";
+
+            document.getElementById("addProductModalLabel").innerText = "Thêm mới sản phẩm";
+            const saveButton = document.getElementById("saveProductBtn");
+            saveButton.innerText = "Lưu sản phẩm";
+
+            const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
+            modal.show();
+        }
+
+        // Function to edit a product
+        function editProduct(productId) {
+            fetch(`/Product/GetProductById?id=${productId}`)
+                .then(response => response.json())
+                .then(product => {
+                    document.getElementById("ProductId").value = product.id;
+                    document.getElementById("Name").value = product.name;
+                    document.getElementById("Category").value = product.category;
+                    document.getElementById("Price").value = product.price;
+                    document.getElementById("Description").value = product.description;
+
+                    document.getElementById("addProductModalLabel").innerText = "Chỉnh sửa sản phẩm";
+                    const saveButton = document.getElementById("saveProductBtn");
+                    saveButton.innerText = "Cập nhật sản phẩm";
+
+                    const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
+                    modal.show();
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Function to delete a product
+        function deleteProduct(productId) {
+            if (!confirm("Bạn chắc chắn muốn xóa sản phẩm?")) return;
+
+            fetch(`/Product/DeleteProduct?id=${productId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    loadProducts(); // Reload the product list
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
 </script>
 </body>
 </html>
