@@ -82,6 +82,7 @@
                     <th>Tên sản phẩm</th>
                     <th>Danh mục</th>
                     <th>Giá</th>
+                    <th>Số lượng</th>
                     <th>Mô tả</th>
                     <th>Hành động</th>
                 </tr>
@@ -94,6 +95,7 @@
                         <td>@product.Name</td>
                         <td>@product.Category</td>
                         <td>@product.Price</td>
+                        <td>@product.Quantity</td>
                         <td>@product.Description</td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="editProduct('@product.Id')">Chỉnh sửa</button>
@@ -107,9 +109,8 @@
 
     <!-- Footer -->
     <footer>
-        © 2024 WebSale
+        © Web được làm bởi Trương Văn Thành Tâm - MSV: 653814
     </footer>
-    <button type="button" class="btn btn-success" onclick="openModalForAdd()">Thêm mới sản phẩm</button>
 
     <!-- Add/Edit Product Modal -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
@@ -133,6 +134,10 @@
                         <div class="mb-3">
                             <label for="Price" class="form-label">Giá</label>
                             <input type="number" class="form-control" id="Price" step="0.01" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="Quantity" class="form-label">Số lượng</label>
+                            <input type="number" class="form-control" id="Quantity" step="1" min="1" required />
                         </div>
                         <div class="mb-3">
                             <label for="Description" class="form-label">Mô tả</label>
@@ -170,6 +175,7 @@
                                 <td>${product.name || 'N/A'}</td>
                                 <td>${product.category || 'N/A'}</td>
                                 <td>${product.price || 'N/A'}</td>
+                                <td>${product.quantity || 'N/A'}</td>
                                 <td>${product.description || 'N/A'}</td>
                                 <td>
                                     <button class="btn btn-warning btn-sm" onclick="editProduct('${product.id}')">Chỉnh sửa</button>
@@ -193,6 +199,7 @@
                 Name: document.getElementById("Name").value.trim(),
                 Category: document.getElementById("Category").value.trim(),
                 Price: parseFloat(document.getElementById("Price").value),
+                Quantity: parseInt(document.getElementById("Quantity").value),
                 Description: document.getElementById("Description").value.trim()
             };
 
@@ -234,7 +241,7 @@
             document.getElementById("ProductId").value = "";
             document.getElementById("Name").value = "";
             document.getElementById("Category").value = "";
-            document.getElementById("Price").value = "";
+            document.getElementById("Quantity").value = "";"";
             document.getElementById("Description").value = "";
 
             document.getElementById("addProductModalLabel").innerText = "Thêm mới sản phẩm";
@@ -254,6 +261,7 @@
                     document.getElementById("Name").value = product.name;
                     document.getElementById("Category").value = product.category;
                     document.getElementById("Price").value = product.price;
+                    document.getElementById("Quantity").value = product.price;
                     document.getElementById("Description").value = product.description;
 
                     document.getElementById("addProductModalLabel").innerText = "Chỉnh sửa sản phẩm";
