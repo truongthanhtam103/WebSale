@@ -1,0 +1,59 @@
+﻿@model IEnumerable<WebSale.Models.Product>
+
+<h1 class="text-center mt-4">Your Cart</h1>
+<table class="table table-bordered table-hover mt-4">
+    <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Product Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td>@product.Name</td>
+                <td>@product.Category</td>
+                <td>@product.Price</td>
+                <td>@product.Description</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="removeFromCart('@product.Id')">Remove</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function removeFromCart(productId) {
+        fetch('/Cart/RemoveFromCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ProductId: productId }) // Truyền đúng định dạng
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(data.message);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message); // Thông báo thành công
+            location.reload(); // Reload lại trang
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            alert("Error: " + error.message);
+        });
+    }
+
+</script>
