@@ -1,0 +1,87 @@
+﻿@model WebSale.Models.PurchaseViewModel
+
+<div class="container mt-5">
+    <h1 class="text-center">Mua sản phẩm</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card p-4 shadow-sm">
+                <h4>@Model.Product.Name</h4>
+                <p><strong>Price:</strong> $@Model.Product.Price</p>
+                <form>
+                    <div class="mb-3">
+                        <label for="quantityInput" class="form-label">Số lượng</label>
+                        <input type="number" id="quantityInput" class="form-control" value="1" min="1" max="@Model.Product.Quantity" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="shippingAddress" class="form-label">Địa chỉ giao hàng</label>
+                        <input type="text" id="shippingAddress" class="form-control" value="@Model.User.Email" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                        <input type="text" id="phoneNumber" class="form-control" value="@Model.User.PhoneNumber" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="paymentMethod" class="form-label">Phương thức thanh toán</label>
+                        <select id="paymentMethod" class="form-select">
+                            <option value="Trả tiền mặt" selected>Trả tiền mặt</option>
+                            <option value="Chuyển khoản">Chuyển khoản</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-success" onclick="placeOrder('@Model.Product.Id', '@Model.Product.Name', '@Model.Product.Price')">Đặt hàng</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function placeOrder(productId, productName, productPrice) {
+        const quantity = parseInt(document.getElementById("quantityInput").value);
+        const shippingAddress = document.getElementById("shippingAddress").value.trim();
+        const phoneNumber = document.getElementById("phoneNumber").value.trim();
+        const paymentMethod = document.getElementById("paymentMethod").value;
+
+        if (!quantity || quantity <= 0) {
+            alert("Số lượng không hợp lệ.");
+            return;
+        }
+
+        const orderData = {
+            ProductId: productId,
+            ProductName: productName,
+            ProductPrice: parseFloat(productPrice),
+            Quantity: quantity,
+            ShippingAddress: shippingAddress,
+            PhoneNumber: phoneNumber,
+            PaymentMethod: paymentMethod
+        };
+
+        fetch('/Order/PlaceOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    if (data.adjustedQuantity) {
+                        alert(data.message);
+                        document.getElementById("quantityInput").value = data.adjustedQuantity;
+                    }
+                    throw new Error(data.message);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            window.location.href = "/Order/History";
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            alert("Lỗi: " + error.message);
+        });
+    }
+</script>

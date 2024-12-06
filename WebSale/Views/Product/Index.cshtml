@@ -27,23 +27,18 @@
     }
     else
     {
-        bool isAdmin = ViewContext.HttpContext.Session.GetString("IsAdmin") == "True"; // Kiểm tra trạng thái admin
-
         foreach (var product in Model.Products)
         {
             <div class="col-md-4 mb-4">
                 <div class="card shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title">@product.Name</h5>
-                        <h5 class="card-title">@product.Quantity</h5>
-                        <p class="card-text">@product.Description</p>
-                        <p class="card-text"><strong>Price:</strong> $@product.Price</p>
-                        <p class="card-text"><small class="text-muted">Category: @product.Category</small></p>
-
-                        @if (!isAdmin) // Chỉ hiển thị nút khi không phải admin
-                        {
-                            <button class="btn btn-primary" onclick="addToCart('@product.Id')">Thêm vào giỏ hàng</button>
-                        }
+                        <h5 class="card-title">Tên sản phẩm: @product.Name</h5>
+                        <p class="card-text">Giá: @product.Price.ToString("N0") VND</p>
+                        <p class="card-text">Danh mục: @product.Category</p>
+                        <p class="card-text">Số lượng: @product.Quantity</p>
+                        <p class="card-text">Mô tả: @product.Description</p>
+                        <button class="btn btn-primary" onclick="addToCart('@product.Id')">Thêm vào giỏ hàng</button>
+                        <a href="@Url.Action("PurchaseProduct", "Order", new { productId = product.Id })" class="btn btn-success mt-2">Mua sản phẩm</a>
                     </div>
                 </div>
             </div>
@@ -84,7 +79,6 @@
     </nav>
 }
 
-
 <!-- Script để xử lý Add to Cart -->
 <script>
     function addToCart(productId) {
@@ -112,4 +106,3 @@
         });
     }
 </script>
-

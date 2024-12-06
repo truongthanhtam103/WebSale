@@ -21,8 +21,16 @@ namespace WebSale.Controllers
             // Lấy danh sách các loại hàng hóa
             var categories = _products.Distinct<string>("Category", Builders<Product>.Filter.Empty).ToList();
 
-            // Lọc sản phẩm theo danh mục (nếu có)
-            var filter = string.IsNullOrEmpty(category) ? Builders<Product>.Filter.Empty : Builders<Product>.Filter.Eq(p => p.Category, category);
+            // Lọc sản phẩm theo danh mục và quantity > 0
+            var filter = Builders<Product>.Filter.Gt(p => p.Quantity, 0); // Lọc các sản phẩm có quantity > 0
+            if (!string.IsNullOrEmpty(category))
+            {
+                filter = Builders<Product>.Filter.And(
+                    filter,
+                    Builders<Product>.Filter.Eq(p => p.Category, category)
+                );
+            }
+
             var totalProducts = _products.CountDocuments(filter); // Tổng số sản phẩm theo bộ lọc
 
             // Phân trang
