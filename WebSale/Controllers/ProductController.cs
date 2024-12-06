@@ -15,45 +15,33 @@ namespace WebSale.Controllers
             _products = database.GetCollection<Product>("Products");
         }
 
-        //public IActionResult Index(string category = null)
-        //{
-        //    // Nếu có category, lọc sản phẩm theo category
-        //    var products = string.IsNullOrEmpty(category)
-        //        ? _products.Find(_ => true).ToList()
-        //        : _products.Find(p => p.Category == category).ToList();
-
-        //    // Lấy danh sách các loại hàng hóa duy nhất
-        //    var categories = _products.AsQueryable()
-        //        .Select(p => p.Category)
-        //        .Distinct()
-        //        .ToList();
-
-        //    // Tạo ViewModel để truyền cả sản phẩm và loại hàng hóa
-        //    var viewModel = new ProductIndexViewModel
-        //    {
-        //        Products = products,
-        //        Categories = categories
-        //    };
-
-        //    return View(viewModel);
-        //}
-
         [HttpGet]
-        public IActionResult Index(string category)
+        public IActionResult Index(string category, int page = 1, int pageSize = 9)
         {
-            // Giao diện danh sách sản phẩm thông thường
+            // Lấy danh sách các loại hàng hóa
             var categories = _products.Distinct<string>("Category", Builders<Product>.Filter.Empty).ToList();
-            var products = string.IsNullOrEmpty(category)
-                ? _products.Find(_ => true).ToList()
-                : _products.Find(p => p.Category == category).ToList();
+
+            // Lọc sản phẩm theo danh mục (nếu có)
+            var filter = string.IsNullOrEmpty(category) ? Builders<Product>.Filter.Empty : Builders<Product>.Filter.Eq(p => p.Category, category);
+            var totalProducts = _products.CountDocuments(filter); // Tổng số sản phẩm theo bộ lọc
+
+            // Phân trang
+            var products = _products
+                .Find(filter)
+                .Skip((page - 1) * pageSize) // Bỏ qua sản phẩm của trang trước
+                .Limit(pageSize) // Lấy số sản phẩm của trang hiện tại
+                .ToList();
 
             var viewModel = new ProductIndexViewModel
             {
                 Categories = categories,
-                Products = products
+                Products = products,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize),
+                SelectedCategory = category
             };
 
-            return View("Index", viewModel); // Hiển thị Index.cshtml
+            return View("Index", viewModel);
         }
 
         // Giao diện quản lý sản phẩm chỉ dành cho admin
@@ -108,21 +96,6 @@ namespace WebSale.Controllers
             var products = _products.Find(_ => true).ToList();
             return Json(products); // Trả về danh sách sản phẩm
         }
-
-        //[HttpGet]
-        //public IActionResult EditProduct(string id)
-        //{
-        //    var product = _products.Find(p => p.Id == id).FirstOrDefault();
-        //    return View(product);
-        //}
-
-        //[HttpPost]
-        //public IActionResult EditProduct(Product product)
-        //{
-        //    var filter = Builders<Product>.Filter.Eq(p => p.Id, product.Id);
-        //    _products.ReplaceOne(filter, product);
-        //    return RedirectToAction("Index");
-        //}
 
         [HttpDelete]
         public IActionResult DeleteProduct(string id)

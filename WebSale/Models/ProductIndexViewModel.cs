@@ -5,7 +5,11 @@ namespace WebSale.Models
 {
     public class ProductIndexViewModel
     {
-        public IEnumerable<Product> Products { get; set; } // Danh sách sản phẩm
-        public IEnumerable<string> Categories { get; set; } // Danh sách loại hàng hóa
+        public List<string> Categories { get; set; }
+        public List<Product> Products { get; set; }
+        public int CurrentPage { get; set; }
+        public int TotalPages { get; set; }
+        public string SelectedCategory { get; set; }
     }
 }
+
