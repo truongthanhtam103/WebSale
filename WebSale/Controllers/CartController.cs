@@ -23,28 +23,28 @@ namespace WebSale.Controllers
         {
             if (string.IsNullOrEmpty(request.ProductId))
             {
-                return BadRequest(new { message = "Product ID is missing." });
+                return BadRequest(new { message = "ID sản phẩm bị thiếu." });
             }
 
             // Lấy thông tin user từ Session
             var username = HttpContext.Session.GetString("Username");
             if (username == null)
             {
-                return Unauthorized(new { message = "You need to log in to add items to the cart." });
+                return Unauthorized(new { message = "Bạn cần phải đăng nhập để thêm sản phẩm vào giỏ hàng." });
             }
 
             // Tìm user trong database
             var user = _users.Find(u => u.Username == username).FirstOrDefault();
             if (user == null)
             {
-                return NotFound(new { message = "User not found." });
+                return NotFound(new { message = "Không tìm thấy người dùng." });
             }
 
             // Kiểm tra sản phẩm có tồn tại không
             var product = _products.Find(p => p.Id == request.ProductId).FirstOrDefault();
             if (product == null)
             {
-                return NotFound(new { message = "Product not found." });
+                return NotFound(new { message = "Không tìm thấy sản phẩm." });
             }
 
             // Thêm sản phẩm vào giỏ hàng nếu chưa có
@@ -54,7 +54,7 @@ namespace WebSale.Controllers
                 _users.ReplaceOne(u => u.Id == user.Id, user);
             }
 
-            return Ok(new { message = "Product added to cart successfully." });
+            return Ok(new { message = "Sản phẩm đã được thêm vào giỏ hàng thành công." });
         }
 
         [HttpGet]
@@ -64,13 +64,13 @@ namespace WebSale.Controllers
             var username = HttpContext.Session.GetString("Username");
             if (username == null)
             {
-                return Unauthorized(new { message = "You need to log in to view the cart." });
+                return Unauthorized(new { message = "Bạn cần phải đăng nhập để xem giỏ hàng." });
             }
 
             var user = _users.Find(u => u.Username == username).FirstOrDefault();
             if (user == null)
             {
-                return NotFound(new { message = "User not found." });
+                return NotFound(new { message = "Không tìm thấy người dùng." });
             }
 
             var products = _products.Find(p => user.Cart.Contains(p.Id)).ToList();
@@ -81,21 +81,21 @@ namespace WebSale.Controllers
         {
             if (string.IsNullOrEmpty(request.ProductId))
             {
-                return BadRequest(new { message = "Product ID is missing." });
+                return BadRequest(new { message = "ID sản phẩm bị thiếu." });
             }
 
             // Lấy thông tin user từ Session
             var username = HttpContext.Session.GetString("Username");
             if (username == null)
             {
-                return Unauthorized(new { message = "You need to log in to modify the cart." });
+                return Unauthorized(new { message = "Bạn cần phải đăng nhập để sửa đổi giỏ hàng." });
             }
 
             // Tìm user trong database
             var user = _users.Find(u => u.Username == username).FirstOrDefault();
             if (user == null)
             {
-                return NotFound(new { message = "User not found." });
+                return NotFound(new { message = "Không tìm thấy người dùng." });
             }
 
             // Xóa sản phẩm khỏi giỏ hàng
@@ -105,7 +105,7 @@ namespace WebSale.Controllers
                 _users.ReplaceOne(u => u.Id == user.Id, user);
             }
 
-            return Ok(new { message = "Product removed from cart successfully." });
+            return Ok(new { message = "Sản phẩm đã được xóa khỏi giỏ hàng thành công." });
         }
 
     }

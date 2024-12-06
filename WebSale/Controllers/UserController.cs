@@ -28,7 +28,7 @@ namespace WebSale.Controllers
             // Kiểm tra mật khẩu nhập lại
             if (password != confirmPassword)
             {
-                ModelState.AddModelError(string.Empty, "Passwords do not match.");
+                ModelState.AddModelError(string.Empty, "Mật khẩu nhập lại không khớp.");
                 return View();
             }
 
@@ -36,7 +36,7 @@ namespace WebSale.Controllers
             var existingUser = _users.Find(u => u.Username == username).FirstOrDefault();
             if (existingUser != null)
             {
-                ModelState.AddModelError(string.Empty, "Username already exists.");
+                ModelState.AddModelError(string.Empty, "Tên người dùng đã tồn tại.");
                 return View();
             }
 
@@ -72,7 +72,7 @@ namespace WebSale.Controllers
             if (user == null)
             {
                 // Thêm lỗi vào ModelState để hiển thị trên giao diện
-                ModelState.AddModelError(string.Empty, "Invalid username or password.");
+                ModelState.AddModelError(string.Empty, "Tên người dùng hoặc mật khẩu không hợp lệ.");
                 return View();
             }
 

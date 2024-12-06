@@ -1,10 +1,10 @@
 ﻿@model WebSale.Models.ProductIndexViewModel
 
-<h1 class="mt-4 text-center">Product List</h1>
+<h1 class="mt-4 text-center">Danh sách sản phẩm</h1>
 
 <!-- Hiển thị danh sách các loại hàng hóa -->
 <div class="mb-4 text-center">
-    <h4>Categories</h4>
+    <h4>Danh mục</h4>
     <ul class="list-inline">
         @foreach (var category in Model.Categories)
         {
@@ -22,7 +22,7 @@
     @if (Model.Products == null || !Model.Products.Any())
     {
         <div class="col-12 text-center">
-            <p>No products found in this category.</p>
+            <p>Không tìm thấy sản phẩm nào trong danh mục này.</p>
         </div>
     }
     else
@@ -36,7 +36,7 @@
                         <p class="card-text">@product.Description</p>
                         <p class="card-text"><strong>Price:</strong> $@product.Price</p>
                         <p class="card-text"><small class="text-muted">Category: @product.Category</small></p>
-                        <button class="btn btn-primary" onclick="addToCart('@product.Id')">Add to Cart</button>
+                        <button class="btn btn-primary" onclick="addToCart('@product.Id')">Thêm vào giỏ hàng</button>
                     </div>
                 </div>
             </div>
@@ -53,7 +53,7 @@
             {
                 <li class="page-item">
                     <a class="page-link" href="@Url.Action("Index", "Product", new { category = Model.SelectedCategory, page = Model.CurrentPage - 1 })">
-                        Previous
+                        Trước
                     </a>
                 </li>
             }
@@ -69,7 +69,7 @@
             {
                 <li class="page-item">
                     <a class="page-link" href="@Url.Action("Index", "Product", new { category = Model.SelectedCategory, page = Model.CurrentPage + 1 })">
-                        Next
+                        Sau
                     </a>
                 </li>
             }

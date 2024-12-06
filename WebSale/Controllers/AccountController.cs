@@ -62,14 +62,14 @@ namespace WebSale.Controllers
         {
             if (string.IsNullOrEmpty(id))
             {
-                return BadRequest(new { message = "User ID is required." });
+                return BadRequest(new { message = "ID người dùng là bắt buộc." });
             }
 
             // Tìm user và khóa
             var user = _users.Find(u => u.Id == id).FirstOrDefault();
             if (user == null)
             {
-                return NotFound(new { message = "User not found." });
+                return NotFound(new { message = "Không tìm thấy người dùng." });
             }
 
             var filter = Builders<User>.Filter.Eq(u => u.Id, id);
@@ -78,10 +78,10 @@ namespace WebSale.Controllers
 
             if (result.ModifiedCount > 0)
             {
-                return Ok(new { message = "User locked successfully." });
+                return Ok(new { message = "Người dùng đã khóa thành công." });
             }
 
-            return BadRequest(new { message = "Failed to lock user." });
+            return BadRequest(new { message = "Không khóa được người dùng." });
         }
 
         [HttpPost]
@@ -90,14 +90,14 @@ namespace WebSale.Controllers
         {
             if (string.IsNullOrEmpty(id))
             {
-                return BadRequest(new { message = "User ID is required." });
+                return BadRequest(new { message = "ID người dùng là bắt buộc." });
             }
 
             // Tìm user và mở khóa
             var user = _users.Find(u => u.Id == id).FirstOrDefault();
             if (user == null)
             {
-                return NotFound(new { message = "User not found." });
+                return NotFound(new { message = "Không tìm thấy người dùng." });
             }
 
             var filter = Builders<User>.Filter.Eq(u => u.Id, id);
@@ -106,10 +106,10 @@ namespace WebSale.Controllers
 
             if (result.ModifiedCount > 0)
             {
-                return Ok(new { message = "User unlocked successfully." });
+                return Ok(new { message = "Người dùng đã mở khóa thành công." });
             }
 
-            return BadRequest(new { message = "Failed to unlock user." });
+            return BadRequest(new { message = "Không mở khóa được người dùng." });
         }
 
         [HttpGet]

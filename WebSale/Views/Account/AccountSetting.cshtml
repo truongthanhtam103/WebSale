@@ -1,6 +1,6 @@
 ﻿@model WebSale.Models.User
 
-<h1 class="text-center mt-4">Account Settings</h1>
+<h1 class="text-center mt-4">Cài đặt tài khoản</h1>
 <div class="row justify-content-center mt-5">
     <div class="col-md-8">
         <div class="card shadow">
@@ -16,30 +16,30 @@
                     @if (Model.IsAdmin)
                     {
                         <li class="list-group-item">
-                            <a href="/Product/AddProduct" class="btn btn-link">Add Product</a>
+                            <a href="/Product/AddProduct" class="btn btn-link">Thêm mới sản phẩm</a>
                         </li>
                         <li class="list-group-item">
-                            <a href="/Product/EditProduct" class="btn btn-link">Edit Products</a>
+                            <a href="/Product/EditProduct" class="btn btn-link">Chỉnh sửa sản phẩm</a>
                         </li>
                         <li class="list-group-item">
-                            <a href="/Product/DeleteProduct" class="btn btn-link">Delete Products</a>
+                            <a href="/Product/DeleteProduct" class="btn btn-link">Xóa sản phẩm</a>
                         </li>
                         <li class="list-group-item">
-                            <button class="btn btn-link" onclick="lockUserPrompt()">Manage Users (Lock/Unlock)</button>
+                            <button class="btn btn-link" onclick="lockUserPrompt()">Quản lý người dùng (Lock/Unlock)</button>
                         </li>
 
                     }
                     else
                     {
                         <li class="list-group-item">
-                            <a href="/Account/Cart" class="btn btn-link">View Cart</a>
+                            <a href="/Account/Cart" class="btn btn-link">Giỏ hàng</a>
                         </li>
                         <li class="list-group-item">
-                            <a href="/Account/PurchaseHistory" class="btn btn-link">Purchase History</a>
+                            <a href="/Account/PurchaseHistory" class="btn btn-link">Lịch sử mua hàng</a>
                         </li>
                     }
                     <li class="list-group-item">
-                        <a href="/Account/UpdateAccount" class="btn btn-link">Update Account Information</a>
+                        <a href="/Account/UpdateAccount" class="btn btn-link">Cập nhật thông tin tài khoản</a>
                     </li>
                 </ul>
             </div>
@@ -48,7 +48,7 @@
 </div>
 <script>
     function lockUserPrompt() {
-        const userId = prompt("Enter the user ID to lock/unlock:");
+        const userId = prompt("Nhập thông tin tài khoản bạn muốn khóa:");
         if (userId) {
             lockUser(userId);
         }

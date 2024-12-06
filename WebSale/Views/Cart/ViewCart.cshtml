@@ -1,15 +1,15 @@
 ﻿@model IEnumerable<WebSale.Models.Product>
 
-<h1 class="text-center mt-4">Your Cart</h1>
+<h1 class="text-center mt-4">Giỏ hàng</h1>
 <table class="table table-bordered table-hover mt-4">
     <thead class="table-light">
         <tr>
             <th>#</th>
-            <th>Product Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Description</th>
-            <th>Actions</th>
+            <th>Tên sản phẩm</th>
+            <th>Danh mục</th>
+            <th>Giá</th>
+            <th>Mô tả</th>
+            <th>Hành động</th>
         </tr>
     </thead>
     <tbody>
@@ -22,7 +22,7 @@
                 <td>@product.Price</td>
                 <td>@product.Description</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="removeFromCart('@product.Id')">Remove</button>
+                    <button class="btn btn-danger btn-sm" onclick="removeFromCart('@product.Id')">Xóa</button>
                 </td>
             </tr>
         }

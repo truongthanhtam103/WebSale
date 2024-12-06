@@ -10,16 +10,17 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h1 class="text-center">Manage Users</h1>
+        <h1 class="text-center">Quản lý người dùng</h1>
         <table class="table table-bordered table-hover mt-4">
             <thead class="table-light">
                 <tr>
                     <th>#</th>
-                    <th>Username</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Mật khẩu</th>
                     <th>Email</th>
-                    <th>Phone Number</th>
-                    <th>Is Admin</th>
-                    <th>Is Locked</th>
+                    <th>Số điện thoại</th>
+                    <th>Quyền quản trị</th>
+                    <th>Tài khoản bị khóa</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -29,6 +30,7 @@
                     <tr>
                         <td>@user.Id</td>
                         <td>@user.Username</td>
+                        <td>@user.Password</td>
                         <td>@user.Email</td>
                         <td>@user.PhoneNumber</td>
                         <td>@user.IsAdmin</td>
@@ -37,13 +39,13 @@
                             @if (user.IsLocked)
                             {
                                 <button class="btn btn-success btn-sm" onclick="unlockUser('@user.Id')">
-                                    Unlock
+                                    Mở khóa tài khoản
                                 </button>
                             }
                             else
                             {
                                 <button class="btn btn-warning btn-sm" onclick="lockUser('@user.Id')">
-                                    Lock
+                                    Khóa tài khoản
                                 </button>
                             }
                         </td>
@@ -89,7 +91,7 @@
 
         // Unlock user
         function unlockUser(userId) {
-            if (!confirm("Are you sure you want to unlock this user?")) return;
+            if (!confirm("Bạn chắc chắn muốn mở tài khoản người dùng này?")) return;
 
             fetch('/Account/UnlockUser', {
                 method: 'POST',

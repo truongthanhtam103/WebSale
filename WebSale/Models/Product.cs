@@ -12,16 +12,16 @@ namespace WebSale.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        [Required(ErrorMessage = "Product Name is required.")]
+        [Required(ErrorMessage = "Tên sản phẩm không phù hợp.")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Category is required.")]
+        [Required(ErrorMessage = "Danh mục không phù hợp.")]
         public string Category { get; set; }
 
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Giá phải lớn hơn 0.")]
         public decimal Price { get; set; }
 
-        [Required(ErrorMessage = "Description is required.")]
+        [Required(ErrorMessage = "Mô tả không phù hợp.")]
         public string? Description { get; set; }
     }
 

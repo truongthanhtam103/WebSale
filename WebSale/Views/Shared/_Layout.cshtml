@@ -10,7 +10,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">WebSale</a>
+            <a class="navbar-brand" href="/">Tâm Store</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -19,10 +19,10 @@
                     @if (ViewContext.HttpContext.Session.GetString("Username") == null)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="/User/Login">Login</a>
+                            <a class="nav-link" href="/User/Login">Đăng nhập</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/User/Register">Register</a>
+                            <a class="nav-link" href="/User/Register">Đăng ký</a>
                         </li>
                     }
                     else
@@ -35,29 +35,29 @@
                                 @if (ViewContext.HttpContext.Session.GetString("IsAdmin") == "True")
                                 {
                                     <li>
-                                        <a class="dropdown-item" href="/Product/ManageProducts">Manage Products</a>
+                                        <a class="dropdown-item" href="/Product/ManageProducts">Quản lý sản phẩm</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="/Account/ManageUsers">Manage Users</a>
+                                        <a class="dropdown-item" href="/Account/ManageUsers">Quản lý người dùng</a>
                                     </li>
                                 }
                                 else
                                 {
                                     <li>
-                                        <a class="dropdown-item" href="/Cart/ViewCart">View Cart</a>
+                                        <a class="dropdown-item" href="/Cart/ViewCart">Giỏ hàng</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="/Order/History">Purchase History</a>
+                                        <a class="dropdown-item" href="/Order/History">Lịch sử mua hàng</a>
                                     </li>
                                 }
 
                                 <li>
-                                    <a class="dropdown-item" href="/Account/UpdateAccount">Update Account Information</a>
+                                    <a class="dropdown-item" href="/Account/UpdateAccount">Cập nhật thông tin tài khoản</a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="post" asp-action="Logout" asp-controller="User" class="d-inline">
-                                        <button type="submit" class="dropdown-item">Logout</button>
+                                        <button type="submit" class="dropdown-item">Đăng xuất</button>
                                     </form>
                                 </li>
                             </ul>
@@ -76,7 +76,7 @@
 
     <footer class="footer mt-4">
         <div class="container">
-            <p class="text-muted text-center">&copy; 2024 WebSale</p>
+            <p class="text-muted text-center">&copy; Web được làm bởi Trương Văn Thành Tâm - MSV: 653814</p>
         </div>
     </footer>
 

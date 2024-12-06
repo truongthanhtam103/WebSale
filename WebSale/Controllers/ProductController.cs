@@ -81,13 +81,13 @@ namespace WebSale.Controllers
                 var errors = ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage);
-                return BadRequest(new { message = "Invalid product data.", errors });
+                return BadRequest(new { message = "Dữ liệu sản phẩm không hợp lệ.", errors });
             }
 
             // Thêm sản phẩm vào cơ sở dữ liệu
             _products.InsertOne(product);
 
-            return Ok(new { message = "Product added successfully." });
+            return Ok(new { message = "Thêm sản phẩm thành công." });
         }
 
         [HttpGet]
@@ -102,7 +102,7 @@ namespace WebSale.Controllers
         {
             var filter = Builders<Product>.Filter.Eq(p => p.Id, id);
             _products.DeleteOne(filter);
-            return Ok(new { message = "Product deleted successfully." });
+            return Ok(new { message = "Xóa sản phẩm thành công." });
         }
 
         [HttpGet]
@@ -111,7 +111,7 @@ namespace WebSale.Controllers
             var product = _products.Find(p => p.Id == id).FirstOrDefault();
             if (product == null)
             {
-                return NotFound(new { message = "Product not found." });
+                return NotFound(new { message = "Không tìm thấy sản phẩm." });
             }
             return Json(product);
         }
@@ -124,12 +124,12 @@ namespace WebSale.Controllers
                 var errors = ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage);
-                return BadRequest(new { message = "Invalid product data.", errors });
+                return BadRequest(new { message = "Dữ liệu sản phẩm không hợp lệ.", errors });
             }
 
             var filter = Builders<Product>.Filter.Eq(p => p.Id, product.Id);
             _products.ReplaceOne(filter, product);
-            return Ok(new { message = "Product updated successfully." });
+            return Ok(new { message = "Chỉnh sửa sản phẩm thành công." });
         }
 
 
