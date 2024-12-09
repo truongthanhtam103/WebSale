@@ -11,74 +11,75 @@
             background-color: #f8f9fa;
             min-height: 100vh;
             position: relative;
-            padding-bottom: 50px; /* Khoảng trống để không bị đè bởi footer */
+            padding-bottom: 50px; /* Khoảng trống để footer không đè lên nội dung */
         }
 
         h1 {
             font-size: 2rem;
             font-weight: bold;
+            margin-bottom: 20px;
         }
-
-        .btn-success {
-            background-color: #28a745;
-            border-color: #28a745;
-        }
-
-            .btn-success:hover {
-                background-color: #218838;
-                border-color: #1e7e34;
-            }
-
-        .btn-warning {
-            background-color: #ffc107;
-            border-color: #ffc107;
-        }
-
-            .btn-warning:hover {
-                background-color: #e0a800;
-                border-color: #d39e00;
-            }
-
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-
-            .btn-danger:hover {
-                background-color: #c82333;
-                border-color: #bd2130;
-            }
 
         table {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            border-collapse: collapse;
         }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+            td img {
+                max-width: 60px;
+                max-height: 60px;
+                border-radius: 5px;
+                object-fit: cover;
+            }
 
         footer {
             position: absolute;
             bottom: 0;
             right: 0;
             width: 100%;
-            text-align: right;
+            text-align: center;
             padding: 10px 20px;
             background-color: #ffffff;
             font-size: 0.85rem;
             border-top: 1px solid #dee2e6;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #d39e00;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
         }
     </style>
 </head>
 <body>
     <div class="container mt-4">
         <h1 class="text-center">Quản lý sản phẩm</h1>
+
+        <!-- Nút thêm mới sản phẩm -->
         <div class="text-end mb-3">
             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
                 Thêm mới sản phẩm
             </button>
         </div>
 
+        <!-- Bảng sản phẩm -->
         <table class="table table-bordered table-hover">
             <thead class="table-light">
                 <tr>
                     <th>#</th>
+                    <th>Ảnh</th>
                     <th>Tên sản phẩm</th>
                     <th>Danh mục</th>
                     <th>Giá</th>
@@ -92,9 +93,13 @@
                 {
                     <tr>
                         <td>@product.Id</td>
+                        <td>
+                            <img src="@(string.IsNullOrEmpty(product.Avatar) ? "/images/AvatarDefault/default.png" : product.Avatar)"
+                                 alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">
+                        </td>
                         <td>@product.Name</td>
                         <td>@product.Category</td>
-                        <td>@product.Price</td>
+                        <td>@product.Price.ToString("N0") VND</td>
                         <td>@product.Quantity</td>
                         <td>@product.Description</td>
                         <td>
@@ -121,7 +126,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="addProductForm">
+                    <form id="addProductForm" enctype="multipart/form-data">
                         <input type="hidden" id="ProductId" />
                         <div class="mb-3">
                             <label for="Name" class="form-label">Tên sản phẩm</label>
@@ -142,6 +147,10 @@
                         <div class="mb-3">
                             <label for="Description" class="form-label">Mô tả</label>
                             <textarea class="form-control" id="Description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Avatar" class="form-label">Hình ảnh</label>
+                            <input type="file" class="form-control" id="Avatar" accept="image/*" />
                         </div>
                         <button type="button" class="btn btn-primary" id="saveProductBtn">Lưu sản phẩm</button>
                     </form>
@@ -166,18 +175,22 @@
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.querySelector("table tbody");
-                    tableBody.innerHTML = ""; // Clear existing content
+                    tableBody.innerHTML = ""; // Xóa nội dung cũ
 
                     data.forEach(product => {
                         tableBody.innerHTML += `
                             <tr>
-                                <td>${product.id || 'N/A'}</td>
-                                <td>${product.name || 'N/A'}</td>
-                                <td>${product.category || 'N/A'}</td>
-                                <td>${product.price || 'N/A'}</td>
-                                <td>${product.quantity || 'N/A'}</td>
-                                <td>${product.description || 'N/A'}</td>
+                                <td>${product.id}</td>
                                 <td>
+                                    <img src="${product.avatar || '/images/AvatarDefault/default.png'}"
+                                         alt="Product Image">
+                                </td>
+                                <td>${product.name}</td>
+                                <td>${product.category}</td>
+                                <td>${product.price.toLocaleString()} VND</td>
+                                <td>${product.quantity}</td>
+                                <td>${product.description}</td>
+                                <td class="action-buttons">
                                     <button class="btn btn-warning btn-sm" onclick="editProduct('${product.id}')">Chỉnh sửa</button>
                                     <button class="btn btn-danger btn-sm" onclick="deleteProduct('${product.id}')">Xóa</button>
                                 </td>
@@ -193,25 +206,31 @@
 
         // Function to handle saving a product
         function saveProductHandler() {
-            const productId = document.getElementById("ProductId").value;
-            const formData = {
-                Id: productId || null,
-                Name: document.getElementById("Name").value.trim(),
-                Category: document.getElementById("Category").value.trim(),
-                Price: parseFloat(document.getElementById("Price").value),
-                Quantity: parseInt(document.getElementById("Quantity").value),
-                Description: document.getElementById("Description").value.trim()
-            };
+            const productId = document.getElementById("ProductId").value; // Lấy Id từ input ẩn
+            const formData = new FormData();
 
-            const url = productId ? '/Product/UpdateProduct' : '/Product/AddProduct';
-            const method = productId ? 'PUT' : 'POST';
+            // Thêm Id vào payload (nếu có)
+            if (productId) {
+                formData.append("Id", productId); // Đảm bảo thêm vào FormData
+            }
+
+            formData.append("Name", document.getElementById("Name").value.trim());
+            formData.append("Category", document.getElementById("Category").value.trim());
+            formData.append("Price", parseFloat(document.getElementById("Price").value));
+            formData.append("Quantity", parseInt(document.getElementById("Quantity").value));
+            formData.append("Description", document.getElementById("Description").value.trim() || "Không có mô tả.");
+
+            const avatarFile = document.getElementById("Avatar").files[0];
+            if (avatarFile) {
+                formData.append("Avatar", avatarFile);
+            }
+
+            const url = productId ? "/Product/UpdateProduct" : "/Product/AddProduct";
+            const method = productId ? "PUT" : "POST";
 
             fetch(url, {
                 method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
+                body: formData,
             })
                 .then(response => {
                     if (!response.ok) {
@@ -224,11 +243,11 @@
                 .then(data => {
                     alert(data.message);
 
-                    // Close the modal
+                    // Đóng modal
                     const modal = bootstrap.Modal.getInstance(document.getElementById("addProductModal"));
                     modal.hide();
 
-                    loadProducts(); // Reload the product list
+                    loadProducts(); // Reload danh sách sản phẩm
                 })
                 .catch(error => {
                     console.error("Error:", error.message);
@@ -238,32 +257,40 @@
 
         // Function to open the modal for adding a product
         function openModalForAdd() {
+            // Reset giá trị của các trường input
             document.getElementById("ProductId").value = "";
             document.getElementById("Name").value = "";
             document.getElementById("Category").value = "";
-            document.getElementById("Quantity").value = "";"";
+            document.getElementById("Price").value = "";
+            document.getElementById("Quantity").value = "";
             document.getElementById("Description").value = "";
+            document.getElementById("Avatar").value = "";
 
+            // Cập nhật lại tiêu đề modal và nút
             document.getElementById("addProductModalLabel").innerText = "Thêm mới sản phẩm";
             const saveButton = document.getElementById("saveProductBtn");
             saveButton.innerText = "Lưu sản phẩm";
 
+            // Hiển thị modal
             const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
             modal.show();
         }
+
 
         // Function to edit a product
         function editProduct(productId) {
             fetch(`/Product/GetProductById?id=${productId}`)
                 .then(response => response.json())
                 .then(product => {
-                    document.getElementById("ProductId").value = product.id;
+                    // Gán giá trị Id vào input ẩn
+                    document.getElementById("ProductId").value = product.id; // Phải gán đúng vào đây
                     document.getElementById("Name").value = product.name;
                     document.getElementById("Category").value = product.category;
                     document.getElementById("Price").value = product.price;
-                    document.getElementById("Quantity").value = product.price;
-                    document.getElementById("Description").value = product.description;
+                    document.getElementById("Quantity").value = product.quantity;
+                    document.getElementById("Description").value = product.description || "";
 
+                    // Cập nhật modal
                     document.getElementById("addProductModalLabel").innerText = "Chỉnh sửa sản phẩm";
                     const saveButton = document.getElementById("saveProductBtn");
                     saveButton.innerText = "Cập nhật sản phẩm";
@@ -271,7 +298,10 @@
                     const modal = new bootstrap.Modal(document.getElementById("addProductModal"));
                     modal.show();
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("Không thể tải thông tin sản phẩm.");
+                });
         }
 
         // Function to delete a product

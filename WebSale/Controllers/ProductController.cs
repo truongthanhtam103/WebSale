@@ -82,28 +82,82 @@ namespace WebSale.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddProduct([FromBody] Product product)
+        public IActionResult AddProduct([FromForm] Product product, IFormFile? Avatar)
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage);
-                Console.WriteLine("Invalid data:", string.Join(", ", errors)); // Log lỗi
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
                 return BadRequest(new { message = "Dữ liệu sản phẩm không hợp lệ.", errors });
             }
 
-            Console.WriteLine("Product to add:", product); // Log dữ liệu sản phẩm
+            // Nếu không có mô tả, đặt giá trị mặc định
+            product.Description ??= "Không có mô tả.";
+
+            // Nếu không có avatar, đặt avatar mặc định
+            if (Avatar != null)
+            {
+                var filePath = Path.Combine("wwwroot/images/products", $"{Guid.NewGuid()}{Path.GetExtension(Avatar.FileName)}");
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    Avatar.CopyTo(stream);
+                }
+                product.Avatar = $"/images/products/{Path.GetFileName(filePath)}";
+            }
+            else
+            {
+                product.Avatar = "/images/AvatarDefault/default.png";
+            }
+
             _products.InsertOne(product);
 
             return Ok(new { message = "Thêm sản phẩm thành công." });
+        }
+
+        [HttpPut]
+        public IActionResult UpdateProduct([FromForm] Product product, IFormFile Avatar)
+        {
+            if (product == null || string.IsNullOrEmpty(product.Id))
+            {
+                return BadRequest(new { message = "Dữ liệu sản phẩm không hợp lệ." });
+            }
+
+            // Kiểm tra và gán avatar mặc định nếu chưa có
+            if (string.IsNullOrEmpty(product.Avatar))
+            {
+                product.Avatar = "/images/AvatarDefault/default-avatar.png"; // Đường dẫn ảnh mặc định
+            }
+
+            if (Avatar != null)
+            {
+                var filePath = Path.Combine("wwwroot/images/products", $"{Guid.NewGuid()}{Path.GetExtension(Avatar.FileName)}");
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    Avatar.CopyTo(stream);
+                }
+                product.Avatar = $"/images/products/{Path.GetFileName(filePath)}";
+            }
+
+            var filter = Builders<Product>.Filter.Eq(p => p.Id, product.Id);
+            _products.ReplaceOne(filter, product);
+
+            return Ok(new { message = "Cập nhật sản phẩm thành công." });
         }
 
         [HttpGet]
         public IActionResult GetAllProducts()
         {
             var products = _products.Find(_ => true).ToList();
-            return Json(products); // Trả về danh sách sản phẩm
+
+            // Thêm avatar mặc định nếu không có
+            foreach (var product in products)
+            {
+                if (string.IsNullOrEmpty(product.Avatar))
+                {
+                    product.Avatar = "/images/AvatarDefault/default-avatar.png";
+                }
+            }
+
+            return Json(products);
         }
 
         [HttpDelete]
@@ -124,25 +178,5 @@ namespace WebSale.Controllers
             }
             return Json(product);
         }
-
-        [HttpPut]
-        public IActionResult UpdateProduct([FromBody] Product product)
-        {
-            if (product == null || string.IsNullOrEmpty(product.Id))
-            {
-                return BadRequest(new { message = "Dữ liệu sản phẩm không hợp lệ." });
-            }
-
-            var filter = Builders<Product>.Filter.Eq(p => p.Id, product.Id);
-            var result = _products.ReplaceOne(filter, product);
-
-            if (result.ModifiedCount > 0)
-            {
-                return Ok(new { message = "Chỉnh sửa sản phẩm thành công." });
-            }
-
-            return NotFound(new { message = "Không tìm thấy sản phẩm để chỉnh sửa." });
-        }
-
     }
 }

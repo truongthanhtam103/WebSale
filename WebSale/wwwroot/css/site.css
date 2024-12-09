@@ -105,4 +105,12 @@ footer {
 .navbar .dropdown-divider {
     margin: 5px 0;
 }
+table img {
+    display: block;
+    margin: auto;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
 
